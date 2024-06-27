@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class PaymentRequest extends Controller
 {
@@ -21,9 +22,9 @@ class PaymentRequest extends Controller
             'currency' => 'required',
         ]);
 
-        $account_number = "YOUR_ACCOUNT_NUMBER"; // Your account number
-        $api_key = "YOUR_API_KEY"; // Your api key
-        $api_secret = "YOUR_SECRET_KEY"; // Your api secret
+        $account_number = "7742065333"; // Your account number
+        $api_key = "73012376fdbbad978ce30a0a4faefd70"; // Your api key
+        $api_secret = "d39ef420e8a10bfbe7204da3b066184c"; // Your api secret
         $order_id = rand(100000, 999999); // Order ID: Every transaction must be unique! This information will be sent back to your page as a notification.
         $amount = $request->amount * 100; // For 9.99, 9.99 * 100 = 999 should be sent.
         $currency = $request->currency; // TRY, USD, EUR
@@ -65,8 +66,6 @@ class PaymentRequest extends Controller
 
         $result = json_decode($result, true);
 
-        error_log(print_r($_SERVER, true));
-
         if ($result['status'] == 'success') {
             $token = $result['payment_token'];
         }
@@ -78,8 +77,8 @@ class PaymentRequest extends Controller
     public function Callback(Request $request)
     {
 
-        $api_key = "YOUR_API_KEY"; // Your api key
-        $api_secret = "YOUR_SECRET_KEY"; // Your api secret
+        $api_key = "73012376fdbbad978ce30a0a4faefd70"; // Your api key
+        $api_secret = "d39ef420e8a10bfbe7204da3b066184c"; // Your api secret
         $order_id = $request->order_id; // Order ID: Every transaction must be unique! This information will be sent back to your page as a notification.
         $status = $request->status; // success, fail
         $amount = $request->amount; // For 9.99, 9.99 * 100 = 999 should be sent.
@@ -93,8 +92,16 @@ class PaymentRequest extends Controller
 
         if ($request->status == 'success') { // Payment is successful
             // Your code here
+            Log::build([
+                'driver' => 'single',
+                'path' => storage_path('logs/payment_success.log'),
+            ])->info($request);
         } else { // Payment is failed
             // Your code here
+            Log::build([
+                'driver' => 'single',
+                'path' => storage_path('logs/payment_failed.log'),
+            ])->info($request);
         }
 
         return "OK";
