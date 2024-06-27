@@ -7,12 +7,6 @@ use Illuminate\Support\Facades\Log;
 
 class PaymentRequest extends Controller
 {
-    // Payment Page Example
-    public function index()
-    {
-        return view('payment_page/payment');
-    }
-
     // Payment Request Example
     public function Payment(Request $request)
     {
